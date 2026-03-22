@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
-const VERSION = "v1.2.5-deterministic"
+const VERSION = "v1.2.6-fix"
 
 function App() {
   const [connection, setConnection] = useState(null)
@@ -39,12 +39,12 @@ function App() {
   // 2. JOIN immediately when host is ready AND connection is ready
   useEffect(() => {
     if (lobbyView === 'host' && roomCode && connection && isHost) {
-      // Check if we've already joined (optional, but good for stability)
-      if (!gameState?.players.some(p => p.name === playerName)) {
+      // Check if we've already joined (CRITICAL: added safe navigation)
+      if (!gameState?.players?.some(p => p.name === playerName)) {
         connection.invoke("JoinRoom", roomCode, playerName)
       }
     }
-  }, [lobbyView, roomCode, connection, isHost, playerName])
+  }, [lobbyView, roomCode, connection, isHost, playerName, gameState])
 
   // Real-time synchronization of settings
   useEffect(() => {
