@@ -505,6 +505,18 @@ button:disabled {
 
 .broadcast-msg { background: #ef4444; padding: 8px 20px; border-radius: 30px; font-weight: 600; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4); }
 
+.pulse-text {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  animation: pulse-opacity 2s infinite ease-in-out;
+}
+
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
 /* --- ANIMATIONS --- */
 
 .animate-fade-in { animation: fadeIn 0.6s ease-out; }

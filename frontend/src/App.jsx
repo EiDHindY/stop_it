@@ -17,6 +17,7 @@ function App() {
   const [selectedMaxPlayers, setSelectedMaxPlayers] = useState(10)
   const [allCategories, setAllCategories] = useState([])
   const [selectedCategories, setSelectedCategories] = useState([])
+  const [isHost, setIsHost] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
 
   // Pre-generate code when entering host view
@@ -96,6 +97,7 @@ function App() {
 
   const hostGame = () => {
     if (connection && playerName && roomCode) {
+      setIsHost(true)
       connection.invoke("JoinRoom", roomCode, playerName)
         .then(() => {
           setJoined(true)
@@ -107,8 +109,9 @@ function App() {
     }
   }
 
-  const joinRoom = (code = roomCode) => {
-    if (connection && code && playerName) {
+  const joinRoom = (code) => {
+    if (connection && playerName && code) {
+      setIsHost(false)
       connection.invoke("JoinRoom", code, playerName)
         .then(() => setJoined(true))
     }
@@ -298,7 +301,7 @@ function App() {
               </div>
 
                <button className="join-btn-premium" onClick={hostGame}>
-                 GENERATE & START GAME
+                 GENERATE ROOM & READY
                </button>
              </div>
           </div>
@@ -317,11 +320,11 @@ function App() {
             <div>
               <h2>Room: <span className="highlight">{roomCode}</span></h2>
               <p className="room-limit-status">
-                Capacity: {gameState?.players.length} / {gameState?.maxPlayers} 
+                Capacity: {gameState?.players.length} / {gameState?.maxPlayers || 10} 
                 {gameState?.selectedCategoriesCount > 0 && ` • ${gameState.selectedCategoriesCount} Categories`}
               </p>
             </div>
-            <div className="badge">Waiting for Players</div>
+            <div className="badge">{isHost ? "Waiting for Players" : "Waiting for Host"}</div>
           </div>
           
           <div className="players-grid">
@@ -335,14 +338,20 @@ function App() {
           {/* Language display removed from here as it's now a host setting */}
 
           <div className="waiting-footer">
-            <p>{gameState?.players.length < 2 ? "Need at least 2 warriors for a clash" : "Armies are ready!"}</p>
-            <button 
-              className="start-btn-premium"
-              onClick={startGame} 
-              disabled={gameState?.players.length < 2}
-            >
-              {gameState?.players.length < 2 ? "WAITING FOR WARRIORS" : "START GAME"}
-            </button>
+            {!isHost ? (
+              <p className="pulse-text">Host is preparing the arena...</p>
+            ) : (
+              <>
+                <p>{gameState?.players.length < 1 ? "Need at least 1 warrior for a clash" : "Armies are ready!"}</p>
+                <button 
+                  className="start-btn-premium"
+                  onClick={startGame} 
+                  disabled={gameState?.players.length < 1}
+                >
+                  {gameState?.players.length < 1 ? "WAITING FOR WARRIORS" : "START GAME NOW"}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
