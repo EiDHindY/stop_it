@@ -20,23 +20,29 @@ function App() {
   const [isHost, setIsHost] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
 
-  // Pre-generate code and JOIN immediately when entering host view
+  // 1. Pre-generate code when entering host view
   useEffect(() => {
     if (lobbyView === 'host' && !roomCode) {
       const newRoomCode = Math.floor(1000 + Math.random() * 9000).toString()
       setRoomCode(newRoomCode)
-      
-      if (connection && playerName) {
-        setIsHost(true)
-        connection.invoke("JoinRoom", newRoomCode, playerName)
-      }
+      setIsHost(true)
     }
     if (lobbyView === 'selection') {
       setRoomCode('')
       setSelectedCategories([])
       setIsHost(false)
     }
-  }, [lobbyView, connection])
+  }, [lobbyView])
+
+  // 2. JOIN immediately when host is ready AND connection is ready
+  useEffect(() => {
+    if (lobbyView === 'host' && roomCode && connection && isHost) {
+      // Check if we've already joined (optional, but good for stability)
+      if (!gameState?.players.some(p => p.name === playerName)) {
+        connection.invoke("JoinRoom", roomCode, playerName)
+      }
+    }
+  }, [lobbyView, roomCode, connection, isHost, playerName])
 
   // Real-time synchronization of settings
   useEffect(() => {
@@ -348,7 +354,7 @@ function App() {
             <div>
               <h2>Room: <span className="highlight">{roomCode}</span></h2>
               <p className="room-limit-status">
-                Capacity: {gameState?.players.length} / {gameState?.maxPlayers || 10} 
+                Capacity: {gameState?.players?.length || 0} / {gameState?.maxPlayers || selectedMaxPlayers || 2} 
                 {gameState?.selectedCategoriesCount > 0 && ` • ${gameState.selectedCategoriesCount} Categories`}
               </p>
             </div>
@@ -370,13 +376,13 @@ function App() {
               <p className="pulse-text">Host is preparing the arena...</p>
             ) : (
               <>
-                <p>{gameState?.players.length < 1 ? "Need at least 1 warrior for a clash" : "Armies are ready!"}</p>
+                <p>{(gameState?.players?.length || 0) < 1 ? "Need at least 1 warrior for a clash" : "Armies are ready!"}</p>
                 <button 
                   className="start-btn-premium"
                   onClick={startGame} 
-                  disabled={gameState?.players.length < 1}
+                  disabled={(gameState?.players?.length || 0) < 1}
                 >
-                  {gameState?.players.length < 1 ? "WAITING FOR WARRIORS" : "START GAME NOW"}
+                  {(gameState?.players?.length || 0) < 1 ? "WAITING FOR WARRIORS" : "START GAME NOW"}
                 </button>
               </>
             )}
