@@ -12,6 +12,8 @@ function App() {
   const [timer, setTimer] = useState(0)
   const [eliminatedMsg, setEliminatedMsg] = useState('')
   const [user, setUser] = useState(null)
+  const [lobbyView, setLobbyView] = useState('selection') // 'selection', 'host', 'join'
+  const [selectedLang, setSelectedLang] = useState('en')
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -67,9 +69,22 @@ function App() {
     }
   }, [connection])
 
-  const joinRoom = () => {
-    if (connection && roomCode && playerName) {
-      connection.invoke("JoinRoom", roomCode, playerName)
+  const hostGame = () => {
+    const newRoomCode = Math.floor(1000 + Math.random() * 9000).toString()
+    setRoomCode(newRoomCode)
+    if (connection && playerName) {
+      connection.invoke("JoinRoom", newRoomCode, playerName)
+        .then(() => {
+          setJoined(true)
+          // Set the language immediately after joining as host
+          connection.invoke("SetLanguage", newRoomCode, selectedLang)
+        })
+    }
+  }
+
+  const joinRoom = (code = roomCode) => {
+    if (connection && code && playerName) {
+      connection.invoke("JoinRoom", code, playerName)
         .then(() => setJoined(true))
     }
   }
@@ -119,45 +134,98 @@ function App() {
             Sign in with Google
           </button>
           
-          <p className="footer-note">Experience the ultimate word competition</p>
+          <p className="footer-note">Experience the ultimate word game</p>
         </div>
       </div>
     )
   }
 
-  // 2. LOBBY VIEW
+  // 2. LOBBY VIEW (Selection)
   if (!joined) {
-    return (
-      <div className="lobby-page">
-        <div className="card-glass lobby-card animate-slide-up">
-           <div className="user-profile-header">
-              <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
-              <div>
-                <p className="welcome">Welcome back,</p>
-                <h3>{user.user_metadata.full_name}</h3>
-              </div>
-              <button className="logout-icon-btn" onClick={logout} title="Sign Out">✕</button>
-           </div>
-
-           <div className="divider-h"></div>
-
-           <div className="lobby-actions">
-             <div className="input-group">
-               <label>Enter Room Code</label>
-               <input 
-                 placeholder="e.g. 1337" 
-                 value={roomCode} 
-                 onChange={e => setRoomCode(e.target.value)} 
-               />
+    if (lobbyView === 'selection') {
+      return (
+        <div className="lobby-page selection">
+          <div className="card-glass selection-card animate-slide-up">
+             <div className="user-profile-header">
+                <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
+                <div>
+                  <p className="welcome">Welcome back,</p>
+                  <h3>{user.user_metadata.full_name}</h3>
+                </div>
+                <button className="logout-icon-btn" onClick={logout} title="Sign Out">✕</button>
              </div>
+             <div className="divider-h"></div>
              
-             <button className="join-btn-premium" onClick={joinRoom}>
-               ENTER BATTLEARENA
-             </button>
-           </div>
+             <div className="lobby-choices">
+               <button className="choice-card host" onClick={() => setLobbyView('host')}>
+                 <span className="icon">🛡️</span>
+                 <div className="text-content">
+                    <h3>Host a Game</h3>
+                    <p>Invite your friends to your arena</p>
+                 </div>
+               </button>
+               
+               <div className="choice-card join-direct">
+                 <span className="icon">⚔️</span>
+                 <div className="text-content">
+                    <h3>Join a Game</h3>
+                    <textarea 
+                      className="paste-area-mini"
+                      placeholder="Paste code here to join..." 
+                      value={roomCode} 
+                      onChange={e => {
+                        const val = e.target.value.trim().slice(0, 4)
+                        setRoomCode(val)
+                        if (val.length === 4) {
+                          joinRoom(val)
+                        }
+                      }} 
+                    />
+                 </div>
+               </div>
+             </div>
+          </div>
         </div>
-      </div>
-    )
+      )
+    }
+
+    if (lobbyView === 'host') {
+      return (
+        <div className="lobby-page host-view">
+          <div className="card-glass lobby-card animate-slide-up">
+             <button className="back-btn" onClick={() => setLobbyView('selection')}>← Back</button>
+             <h2>Host a Game</h2>
+             <p className="description">Set your rules before the warriors arrive.</p>
+             <div className="divider-h"></div>
+             
+             <div className="lobby-actions">
+               <div className="language-selection">
+                <span className="label">Game Language</span>
+                <div className="toggle-group">
+                  <button 
+                    className={`toggle-btn ${selectedLang === 'en' ? 'active' : ''}`}
+                    onClick={() => setSelectedLang('en')}
+                  >
+                    ENGLISH
+                  </button>
+                  <button 
+                    className={`toggle-btn ${selectedLang === 'ar' ? 'active' : ''}`}
+                    onClick={() => setSelectedLang('ar')}
+                  >
+                    ARABIC
+                  </button>
+                </div>
+              </div>
+
+               <button className="join-btn-premium" onClick={hostGame}>
+                 GENERATE & START GAME
+               </button>
+             </div>
+          </div>
+        </div>
+      )
+    }
+
   }
 
   // 3. GAME VIEW (Wait for Game Start)
@@ -178,23 +246,7 @@ function App() {
             ))}
           </div>
 
-          <div className="language-selection">
-            <span className="label">Linguistic Battleground</span>
-            <div className="toggle-group">
-              <button 
-                className={`toggle-btn ${gameState?.language === 'en' ? 'active' : ''}`}
-                onClick={() => setLanguage('en')}
-              >
-                ENGLISH
-              </button>
-              <button 
-                className={`toggle-btn ${gameState?.language === 'ar' ? 'active' : ''}`}
-                onClick={() => setLanguage('ar')}
-              >
-                ARABIC
-              </button>
-            </div>
-          </div>
+          {/* Language display removed from here as it's now a host setting */}
 
           <div className="waiting-footer">
             <p>{gameState?.players.length < 2 ? "Need at least 2 warriors for a clash" : "Armies are ready!"}</p>
@@ -203,7 +255,7 @@ function App() {
               onClick={startGame} 
               disabled={gameState?.players.length < 2}
             >
-              IGNITE BATTLE
+              {gameState?.players.length < 2 ? "WAITING FOR WARRIORS" : "START GAME"}
             </button>
           </div>
         </div>

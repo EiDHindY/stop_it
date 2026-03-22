@@ -92,9 +92,10 @@ public class GameHub : Hub
     private async Task NextTurn(GameRoom room)
     {
         var activePlayer = room.GetActivePlayer();
-        if (activePlayer == null || room.Players.Count(p => !p.IsEliminated) <= 1)
+        if (activePlayer == null || (room.Players.Count(p => !p.IsEliminated) <= 1))
         {
-            await Clients.Group(room.RoomCode).SendAsync("GameOver");
+            var winner = room.Players.FirstOrDefault(p => !p.IsEliminated);
+            await Clients.Group(room.RoomCode).SendAsync("GameOver", winner?.Name);
             return;
         }
 

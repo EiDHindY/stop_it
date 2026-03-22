@@ -56,7 +56,7 @@ body {
   margin: 2rem 0;
 }
 
-input {
+input, textarea {
   width: 100%;
   padding: 14px 20px;
   border-radius: 16px;
@@ -66,9 +66,21 @@ input {
   font-size: 1.1rem;
   outline: none;
   transition: all 0.3s ease;
+  font-family: inherit;
 }
 
-input:focus {
+textarea.paste-area {
+  height: 120px;
+  resize: none;
+  font-size: 1.5rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 40px; /* Center text vertically since it's a textarea */
+}
+
+input:focus, textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 15px var(--primary-glow);
   background: rgba(15, 23, 42, 0.6);
@@ -129,6 +141,14 @@ button {
   box-shadow: 0 15px 30px rgba(56, 189, 248, 0.4);
 }
 
+button:disabled {
+  opacity: 0.5;
+  filter: grayscale(1);
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 .action-btn-main.pulse {
   animation: pulse-glow 2s infinite;
 }
@@ -160,6 +180,73 @@ button {
 .logout-icon-btn:hover { color: #f87171; }
 
 .waiting-card { max-width: 600px; margin: 0 auto; text-align: center; }
+.description { color: var(--text-dim); margin-bottom: 1.5rem; }
+.back-btn { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; margin-bottom: 1rem; padding: 0; transition: color 0.3s; }
+.back-btn:hover { color: var(--primary); }
+
+.lobby-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.choice-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  text-align: left;
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.choice-card:hover {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: var(--primary);
+  transform: translateX(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.choice-card.join-direct {
+  cursor: default;
+}
+
+.choice-card.join-direct:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--glass-border);
+  box-shadow: none;
+}
+
+.paste-area-mini {
+  width: 100%;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: white;
+  padding: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: none;
+  margin-top: 0.8rem;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.paste-area-mini:focus {
+  border-color: var(--primary);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.choice-card .icon { font-size: 2.5rem; }
+.choice-card h3 { font-size: 1.3rem; margin-bottom: 0.2rem; }
+.choice-card p { font-size: 0.9rem; color: var(--text-dim); }
 .highlight { color: var(--primary); }
 .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); font-size: 0.8rem; margin-top: 0.5rem; }
 .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; margin: 2rem 0; }
@@ -217,7 +304,17 @@ button {
 }
 
 @media (max-width: 768px) {
-  .game-container { grid-template-columns: 1fr; }
+  .game-container { grid-template-columns: 1fr; gap: 1rem; }
+  .card-glass { padding: 1.5rem; border-radius: 20px; }
+  .logo-icon { font-size: 3rem; }
+  .logo-container h1 { font-size: 2.2rem; }
+  .giant-letter { font-size: 8rem; margin: 1rem 0; }
+  .arabic-mode .giant-letter { font-size: 10rem; }
+  .choice-card { padding: 1.2rem; gap: 1rem; }
+  .choice-card .icon { font-size: 2rem; }
+  .choice-card h3 { font-size: 1.1rem; }
+  .choice-card p { font-size: 0.8rem; }
+  #root { padding: 1rem; }
 }
 
 .sidebar h3 { margin-bottom: 1.5rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
