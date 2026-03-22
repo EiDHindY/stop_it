@@ -79,6 +79,19 @@ public class GameHub : Hub
         }
     }
 
+    public async Task ResetScores(string roomCode)
+    {
+        var room = _gameManager.GetRoom(roomCode);
+        if (room != null)
+        {
+            foreach (var player in room.Players)
+            {
+                player.Scores = 0;
+            }
+            await NotifyRoomState(room);
+        }
+    }
+
     public async Task StartGame(string roomCode)
     {
         var room = _gameManager.GetRoom(roomCode);
@@ -145,6 +158,8 @@ public class GameHub : Hub
         if (activePlayer == null || (isMultiplayer && onlyOneLeft))
         {
             var winner = room.Players.FirstOrDefault(p => !p.IsEliminated);
+            if (winner != null) winner.Scores++; // Record the win!
+            
             await _hubContext.Clients.Group(room.RoomCode).SendAsync("GameOver", winner?.Name);
             return;
         }
@@ -207,9 +222,17 @@ public class GameHub : Hub
         var english = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         var arabic = "أبتثجحخدذرزسشصضطظعغفقكلمنهوي";
         
-        var picked = lang == "ar" ? arabic : english;
-        var res = picked[new Random().Next(picked.Length)].ToString();
-        return res;
+        string picked;
+        if (lang == "mixed")
+        {
+            picked = new Random().Next(2) == 0 ? english : arabic;
+        }
+        else
+        {
+            picked = lang == "ar" ? arabic : english;
+        }
+        
+        return picked[new Random().Next(picked.Length)].ToString();
     }
 
     private async Task NotifyRoomState(GameRoom room)
@@ -226,7 +249,7 @@ public class GameHub : Hub
             SelectedCategoriesCount = room.SelectedCategories.Count,
             room.TimeRemaining,
             ActivePlayer = room.GetActivePlayer()?.Name,
-            Players = room.Players.Select(p => new { p.Name, p.IsEliminated })
+            Players = room.Players.Select(p => new { p.Name, p.IsEliminated, p.Scores })
         });
     }
 }

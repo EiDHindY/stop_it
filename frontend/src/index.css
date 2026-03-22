@@ -367,7 +367,7 @@ button:disabled {
 
 .toggle-group {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
   background: rgba(15, 23, 42, 0.4);
   padding: 6px;
   border-radius: 16px;
@@ -504,6 +504,8 @@ button:disabled {
 .status-indicator { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; }
 .active .status-indicator { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
 .eliminated { opacity: 0.4; filter: grayscale(1); }
+.reset-scores-btn { margin-top: 1rem; background: transparent; border: 1px solid var(--glass-border); color: #f87171; font-size: 0.75rem; padding: 6px 12px; border-radius: 20px; width: 100%; transition: all 0.3s; }
+.reset-scores-btn:hover { background: rgba(248, 113, 113, 0.1); border-color: #f87171; color: #ef4444; }
 
 .category-banner { padding: 1rem 2rem; text-align: center; font-size: 1.8rem; font-weight: 600; margin-bottom: 2rem; }
 .giant-letter { font-size: 8rem; font-weight: 800; text-align: center; line-height: 1; margin: 2rem 0; background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 20px 40px rgba(56, 189, 248, 0.3); transition: all 0.5s ease; }

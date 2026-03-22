@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
-const VERSION = "v1.4.1-ui"
+const VERSION = "v1.5.1-vanguard-fix"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5122"
 
 function App() {
@@ -375,7 +375,7 @@ function App() {
               <div className="language-selection">
                 <span className="label">Warrior Categories</span>
                 <div className="category-chips">
-                  {allCategories.filter(c => c.language === selectedLang).map(cat => (
+                  {allCategories.filter(c => selectedLang === 'mixed' ? true : c.language === selectedLang).map(cat => (
                     <button 
                       key={cat.id}
                       className={`cat-chip ${selectedCategories.includes(cat.name) ? 'active' : ''}`}
@@ -462,13 +462,21 @@ function App() {
           <div className="sidebar card-glass">
             <h3>Warriors</h3>
             <div className="players-list-modern">
-              {gameState.players.map(p => (
-                <div key={p.name} className={`player-row ${p.name === gameState.activePlayer ? 'active' : ''} ${p.isEliminated ? 'eliminated' : ''}`}>
-                  <span className="status-indicator"></span>
-                  <span className="p-name">{p.name}</span>
-                  {p.isEliminated && <span className="skull">💀</span>}
-                </div>
-              ))}
+               {gameState.players.map(p => (
+                 <div key={p.name} className={`player-row ${p.name === gameState.activePlayer ? 'active' : ''} ${p.isEliminated ? 'eliminated' : ''}`}>
+                   <span className="status-indicator"></span>
+                   <span className="p-name">
+                     {p.name} 
+                     {isHost && p.scores > 0 && <span className="p-score"> 🏆 {p.scores}</span>}
+                   </span>
+                   {p.isEliminated && <span className="skull">💀</span>}
+                 </div>
+               ))}
+               {isHost && (
+                 <button className="reset-scores-btn" onClick={() => connection.invoke("ResetScores", roomCode)}>
+                   Reset Scores
+                 </button>
+               )}
             </div>
           </div>
 
