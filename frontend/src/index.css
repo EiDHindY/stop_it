@@ -208,11 +208,30 @@ button:disabled {
   text-transform: uppercase;
 }
 
-.host-header-row {
+.warriors-preview {
+  margin: 1rem 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.mini-bubbles {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mini-bubble {
+  background: var(--primary-glow);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .room-code-badge {

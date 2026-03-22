@@ -14,23 +14,48 @@ function App() {
   const [user, setUser] = useState(null)
   const [lobbyView, setLobbyView] = useState('selection') // 'selection', 'host', 'join'
   const [selectedLang, setSelectedLang] = useState('en')
-  const [selectedMaxPlayers, setSelectedMaxPlayers] = useState(10)
+  const [selectedMaxPlayers, setSelectedMaxPlayers] = useState(2)
   const [allCategories, setAllCategories] = useState([])
   const [selectedCategories, setSelectedCategories] = useState([])
   const [isHost, setIsHost] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
 
-  // Pre-generate code when entering host view
+  // Pre-generate code and JOIN immediately when entering host view
   useEffect(() => {
     if (lobbyView === 'host' && !roomCode) {
       const newRoomCode = Math.floor(1000 + Math.random() * 9000).toString()
       setRoomCode(newRoomCode)
+      
+      if (connection && playerName) {
+        setIsHost(true)
+        connection.invoke("JoinRoom", newRoomCode, playerName)
+      }
     }
     if (lobbyView === 'selection') {
       setRoomCode('')
       setSelectedCategories([])
+      setIsHost(false)
     }
-  }, [lobbyView])
+  }, [lobbyView, connection])
+
+  // Real-time synchronization of settings
+  useEffect(() => {
+    if (isHost && roomCode && connection) {
+      connection.invoke("SetLanguage", roomCode, selectedLang)
+    }
+  }, [selectedLang, isHost, roomCode, connection])
+
+  useEffect(() => {
+    if (isHost && roomCode && connection) {
+      connection.invoke("SetMaxPlayers", roomCode, selectedMaxPlayers)
+    }
+  }, [selectedMaxPlayers, isHost, roomCode, connection])
+
+  useEffect(() => {
+    if (isHost && roomCode && connection) {
+      connection.invoke("SetCategories", roomCode, selectedCategories)
+    }
+  }, [selectedCategories, isHost, roomCode, connection])
 
   useEffect(() => {
     // Fetch all categories from Supabase
@@ -96,17 +121,7 @@ function App() {
   }, [connection])
 
   const hostGame = () => {
-    if (connection && playerName && roomCode) {
-      setIsHost(true)
-      connection.invoke("JoinRoom", roomCode, playerName)
-        .then(() => {
-          setJoined(true)
-          // Set the language, max players, and categories immediately after joining as host
-          connection.invoke("SetLanguage", roomCode, selectedLang)
-          connection.invoke("SetMaxPlayers", roomCode, selectedMaxPlayers)
-          connection.invoke("SetCategories", roomCode, selectedCategories)
-        })
-    }
+    setJoined(true)
   }
 
   const joinRoom = (code) => {
@@ -241,6 +256,19 @@ function App() {
                <h2>Host a Game</h2>
                <div className="room-code-badge">Code: <span>{roomCode}</span></div>
              </div>
+
+             {gameState?.players && (
+               <div className="warriors-preview animate-fade-in">
+                 <span className="label">Warriors Ready: ({gameState.players.length}/{selectedMaxPlayers})</span>
+                 <div className="mini-bubbles">
+                   {gameState.players.map(p => (
+                     <div key={p.name} className="mini-bubble">{p.name}</div>
+                   ))}
+                   {gameState.players.length === 0 && <p className="selection-hint">Waiting for the first warrior...</p>}
+                 </div>
+               </div>
+             )}
+             
              <p className="description">Set your rules and share the code with warriors.</p>
              <div className="divider-h"></div>
              
