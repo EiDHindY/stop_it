@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "2hEwoC268H8=",
+  "success": true,
+  "projectFilePath": "/home/dod/projects/stop it is complete/backend/StopGame.Api.csproj",
+  "expectedPackageFiles": [
+    "/home/dod/.nuget/packages/microsoft.aspnetcore.openapi/10.0.4/microsoft.aspnetcore.openapi.10.0.4.nupkg.sha512",
+    "/home/dod/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
