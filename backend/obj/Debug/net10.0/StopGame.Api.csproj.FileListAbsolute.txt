@@ -31,3 +31,4 @@
 /home/dod/projects/stop it is complete/backend/obj/Debug/net10.0/StopGame.Api.pdb
 /home/dod/projects/stop it is complete/backend/obj/Debug/net10.0/StopGame.Api.genruntimeconfig.cache
 /home/dod/projects/stop it is complete/backend/obj/Debug/net10.0/ref/StopGame.Api.dll
+/home/dod/projects/stop it is complete/backend/obj/Debug/net10.0/StopGame.Api.sourcelink.json

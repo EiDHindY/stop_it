@@ -94,7 +94,18 @@ public class GameHub : Hub
 
         room.TurnTimer?.Dispose();
         room.TurnTimer = new System.Timers.Timer(1000);
-        room.TurnTimer.Elapsed += async (sender, e) => await TimerTick(room);
+        room.TurnTimer.Elapsed += async (sender, e) => 
+        {
+            try 
+            {
+                await TimerTick(room);
+            }
+            catch (Exception ex)
+            {
+                // In a real app, log this
+                Console.WriteLine($"Timer error: {ex.Message}");
+            }
+        };
         room.TurnTimer.Start();
     }
 
