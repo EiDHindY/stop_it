@@ -4,7 +4,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5174") // Updated Vite port
+        policy.WithOrigins("http://localhost:5174", "https://stop-it-seven.vercel.app") 
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); // Required for SignalR
