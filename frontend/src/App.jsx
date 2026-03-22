@@ -3,7 +3,8 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
-const VERSION = "v1.2.6-fix"
+const VERSION = "v1.2.7-ip"
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5122"
 
 function App() {
   const [connection, setConnection] = useState(null)
@@ -98,7 +99,7 @@ function App() {
 
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl("http://localhost:5122/gamehub") // Match your .NET port
+      .withUrl(`${BACKEND_URL}/gamehub`) // Match your .NET port
       .withAutomaticReconnect()
       .build()
 
