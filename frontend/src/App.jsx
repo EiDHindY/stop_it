@@ -19,6 +19,18 @@ function App() {
   const [selectedCategories, setSelectedCategories] = useState([])
   const [isInitializing, setIsInitializing] = useState(true)
 
+  // Pre-generate code when entering host view
+  useEffect(() => {
+    if (lobbyView === 'host' && !roomCode) {
+      const newRoomCode = Math.floor(1000 + Math.random() * 9000).toString()
+      setRoomCode(newRoomCode)
+    }
+    if (lobbyView === 'selection') {
+      setRoomCode('')
+      setSelectedCategories([])
+    }
+  }, [lobbyView])
+
   useEffect(() => {
     // Fetch all categories from Supabase
     supabase.from('categories').select('*')
@@ -83,16 +95,14 @@ function App() {
   }, [connection])
 
   const hostGame = () => {
-    const newRoomCode = Math.floor(1000 + Math.random() * 9000).toString()
-    setRoomCode(newRoomCode)
-    if (connection && playerName) {
-      connection.invoke("JoinRoom", newRoomCode, playerName)
+    if (connection && playerName && roomCode) {
+      connection.invoke("JoinRoom", roomCode, playerName)
         .then(() => {
           setJoined(true)
           // Set the language, max players, and categories immediately after joining as host
-          connection.invoke("SetLanguage", newRoomCode, selectedLang)
-          connection.invoke("SetMaxPlayers", newRoomCode, selectedMaxPlayers)
-          connection.invoke("SetCategories", newRoomCode, selectedCategories)
+          connection.invoke("SetLanguage", roomCode, selectedLang)
+          connection.invoke("SetMaxPlayers", roomCode, selectedMaxPlayers)
+          connection.invoke("SetCategories", roomCode, selectedCategories)
         })
     }
   }
@@ -224,8 +234,11 @@ function App() {
         <div className="lobby-page host-view">
           <div className="card-glass lobby-card animate-slide-up">
              <button className="back-btn" onClick={() => setLobbyView('selection')}>← Back</button>
-             <h2>Host a Game</h2>
-             <p className="description">Set your rules before the warriors arrive.</p>
+             <div className="host-header-row">
+               <h2>Host a Game</h2>
+               <div className="room-code-badge">Code: <span>{roomCode}</span></div>
+             </div>
+             <p className="description">Set your rules and share the code with warriors.</p>
              <div className="divider-h"></div>
              
              <div className="lobby-actions">
