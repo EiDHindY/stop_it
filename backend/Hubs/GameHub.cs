@@ -172,6 +172,8 @@ public class GameHub : Hub
     private async Task TimerTick(GameRoom room)
     {
         room.TimeRemaining--;
+        await _hubContext.Clients.Group(room.RoomCode).SendAsync("TimerUpdate", room.TimeRemaining);
+
         if (room.TimeRemaining <= 0)
         {
             room.TurnTimer?.Stop();
@@ -179,13 +181,13 @@ public class GameHub : Hub
             if (activePlayer != null)
             {
                 activePlayer.IsEliminated = true;
-                await Clients.Group(room.RoomCode).SendAsync("PlayerEliminated", activePlayer.Name);
+                await _hubContext.Clients.Group(room.RoomCode).SendAsync("PlayerEliminated", activePlayer.Name);
                 
                 // Check win condition
                 if (room.Players.Count(p => !p.IsEliminated) <= 1)
                 {
                     var winner = room.Players.FirstOrDefault(p => !p.IsEliminated);
-                    await Clients.Group(room.RoomCode).SendAsync("GameOver", winner?.Name);
+                    await _hubContext.Clients.Group(room.RoomCode).SendAsync("GameOver", winner?.Name);
                     return;
                 }
                 
@@ -193,14 +195,10 @@ public class GameHub : Hub
                 room.CurrentTurnIndex = (room.CurrentTurnIndex + 1) % room.Players.Count;
                 while (room.GetActivePlayer()?.IsEliminated == true)
                 {
-                     room.CurrentTurnIndex = (room.CurrentTurnIndex + 1) % room.Players.Count;
+                    room.CurrentTurnIndex = (room.CurrentTurnIndex + 1) % room.Players.Count;
                 }
                 await NextTurn(room);
             }
-        }
-        else
-        {
-            await _hubContext.Clients.Group(room.RoomCode).SendAsync("TimerUpdate", room.TimeRemaining);
         }
     }
 

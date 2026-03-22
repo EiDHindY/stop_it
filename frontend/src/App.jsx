@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
-const VERSION = "v1.3.2-timer-fix"
+const VERSION = "v1.4.0-audio"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5122"
 
 function App() {
@@ -72,6 +72,37 @@ function App() {
       connection.invoke("SetTurnTimer", roomCode, selectedTimer)
     }
   }, [selectedTimer, isHost, roomCode, connection])
+
+  useEffect(() => {
+    // Audio Synthesis for Timer
+    const playSound = (freq, type = 'sine', duration = 0.1) => {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+        const osc = audioCtx.createOscillator()
+        const gain = audioCtx.createGain()
+        
+        osc.type = type
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime)
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration)
+        
+        osc.connect(gain)
+        gain.connect(audioCtx.destination)
+        
+        osc.start()
+        osc.stop(audioCtx.currentTime + duration)
+      } catch (e) {
+        console.error("Audio failed", e)
+      }
+    }
+
+    if (timer <= 5 && timer > 0) {
+      playSound(800, 'sine', 0.05) // High tick
+    } else if (timer === 0 && gameState?.gameStarted) {
+      playSound(150, 'sawtooth', 0.5) // Low buzzer
+    }
+  }, [timer, gameState?.gameStarted])
 
   useEffect(() => {
     // Fetch all categories from Supabase
