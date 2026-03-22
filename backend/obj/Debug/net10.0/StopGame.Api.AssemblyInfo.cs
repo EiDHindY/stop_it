@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StopGame.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d13d27c1f758cdc8f3adbde5d90ad441a7b02cb9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6cbeb121119ec5ea2ed4f35a394e1c84e1ee292e")]
 [assembly: System.Reflection.AssemblyProductAttribute("StopGame.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StopGame.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

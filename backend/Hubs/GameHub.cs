@@ -7,10 +7,12 @@ namespace StopGame.Api.Hubs;
 public class GameHub : Hub
 {
     private readonly GameManager _gameManager;
+    private readonly IHubContext<GameHub> _hubContext;
 
-    public GameHub(GameManager gameManager)
+    public GameHub(GameManager gameManager, IHubContext<GameHub> hubContext)
     {
         _gameManager = gameManager;
+        _hubContext = hubContext;
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -136,14 +138,18 @@ public class GameHub : Hub
     private async Task NextTurn(GameRoom room)
     {
         var activePlayer = room.GetActivePlayer();
-        if (activePlayer == null || (room.Players.Count(p => !p.IsEliminated) <= 1))
+        // Only end game if there were 2+ players and now 1 left, or everyone is gone
+        bool isMultiplayer = room.Players.Count > 1;
+        bool onlyOneLeft = room.Players.Count(p => !p.IsEliminated) <= 1;
+
+        if (activePlayer == null || (isMultiplayer && onlyOneLeft))
         {
             var winner = room.Players.FirstOrDefault(p => !p.IsEliminated);
-            await Clients.Group(room.RoomCode).SendAsync("GameOver", winner?.Name);
+            await _hubContext.Clients.Group(room.RoomCode).SendAsync("GameOver", winner?.Name);
             return;
         }
 
-        room.TimeRemaining = room.TurnTimerSeconds; // Use custom timer
+        room.TimeRemaining = room.TurnTimerSeconds;
         await NotifyRoomState(room);
 
         room.TurnTimer?.Dispose();
@@ -194,7 +200,7 @@ public class GameHub : Hub
         }
         else
         {
-            await Clients.Group(room.RoomCode).SendAsync("TimerUpdate", room.TimeRemaining);
+            await _hubContext.Clients.Group(room.RoomCode).SendAsync("TimerUpdate", room.TimeRemaining);
         }
     }
 
@@ -210,7 +216,7 @@ public class GameHub : Hub
 
     private async Task NotifyRoomState(GameRoom room)
     {
-        await Clients.Group(room.RoomCode).SendAsync("RoomStateUpdated", new
+        await _hubContext.Clients.Group(room.RoomCode).SendAsync("RoomStateUpdated", new
         {
             room.RoomCode,
             room.GameStarted,
