@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
-const VERSION = "v1.2.7-ip"
+const VERSION = "v1.2.8-sync"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5122"
 
 function App() {
