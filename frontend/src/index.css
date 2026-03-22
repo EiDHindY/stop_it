@@ -489,8 +489,8 @@ button:disabled {
   .card-glass { padding: 1.5rem; border-radius: 20px; }
   .logo-icon { font-size: 3rem; }
   .logo-container h1 { font-size: 2.2rem; }
-  .giant-letter { font-size: 8rem; margin: 1rem 0; }
-  .arabic-mode .giant-letter { font-size: 10rem; }
+  .giant-letter { font-size: 5rem; margin: 1rem 0; }
+  .arabic-mode .giant-letter { font-size: 6rem; }
   .choice-card { padding: 1.2rem; gap: 1rem; }
   .choice-card .icon { font-size: 2rem; }
   .choice-card h3 { font-size: 1.1rem; }
@@ -506,10 +506,10 @@ button:disabled {
 .eliminated { opacity: 0.4; filter: grayscale(1); }
 
 .category-banner { padding: 1rem 2rem; text-align: center; font-size: 1.8rem; font-weight: 600; margin-bottom: 2rem; }
-.giant-letter { font-size: 12rem; font-weight: 800; text-align: center; line-height: 1; margin: 2rem 0; background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 20px 40px rgba(56, 189, 248, 0.3); transition: all 0.5s ease; }
+.giant-letter { font-size: 8rem; font-weight: 800; text-align: center; line-height: 1; margin: 2rem 0; background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 20px 40px rgba(56, 189, 248, 0.3); transition: all 0.5s ease; }
 
 .arabic-mode .giant-letter {
-  font-size: 14rem;
+  font-size: 10rem;
   font-family: 'Outfit', sans-serif; /* We can add a specific Arabic font later if needed */
   margin: 1rem 0;
 }
