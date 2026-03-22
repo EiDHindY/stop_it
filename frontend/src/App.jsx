@@ -3,6 +3,8 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
+const VERSION = "v1.2.5-deterministic"
+
 function App() {
   const [connection, setConnection] = useState(null)
   const [joined, setJoined] = useState(false)
@@ -171,6 +173,7 @@ function App() {
   if (isInitializing) {
     return (
       <div className="loading-page">
+        <div className="version-tag">{VERSION}</div>
         <div className="loading-content animate-pulse-gentle">
           <div className="loading-logo">🛑</div>
           <div className="loading-bar-container">
@@ -186,6 +189,7 @@ function App() {
   if (!user) {
     return (
       <div className="login-page">
+        <div className="version-tag">{VERSION}</div>
         <div className="card-glass login-card animate-fade-in">
           <div className="logo-container">
             <span className="logo-icon">🛑</span>
@@ -209,6 +213,7 @@ function App() {
     if (lobbyView === 'selection') {
       return (
         <div className="lobby-page selection">
+          <div className="version-tag">{VERSION}</div>
           <div className="card-glass selection-card animate-slide-up">
              <div className="user-profile-header">
                 <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
@@ -256,6 +261,7 @@ function App() {
     if (lobbyView === 'host') {
       return (
         <div className="lobby-page host-view">
+          <div className="version-tag">{VERSION}</div>
           <div className="card-glass lobby-card animate-slide-up">
              <button className="back-btn" onClick={() => setLobbyView('selection')}>← Back</button>
              <div className="host-header-row">
@@ -397,6 +403,7 @@ function App() {
 
   return (
     <div className="game-page animate-fade-in">
+       <div className="version-tag">{VERSION}</div>
        <div className="game-container">
           <div className="sidebar card-glass">
             <h3>Warriors</h3>
