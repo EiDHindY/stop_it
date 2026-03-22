@@ -17,6 +17,7 @@ public class GameRoom
     public string Language { get; set; } = "en"; // "en" or "ar"
     public int CurrentTurnIndex { get; set; } = 0;
     public int TimeRemaining { get; set; } = 0;
+    public int TurnTimerSeconds { get; set; } = 15;
     public Timer? TurnTimer { get; set; }
     
     public Player? GetActivePlayer()

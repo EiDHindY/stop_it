@@ -67,6 +67,16 @@ public class GameHub : Hub
         }
     }
 
+    public async Task SetTurnTimer(string roomCode, int seconds)
+    {
+        var room = _gameManager.GetRoom(roomCode);
+        if (room != null && !room.GameStarted)
+        {
+            room.TurnTimerSeconds = seconds;
+            await NotifyRoomState(room);
+        }
+    }
+
     public async Task StartGame(string roomCode)
     {
         var room = _gameManager.GetRoom(roomCode);
@@ -133,7 +143,7 @@ public class GameHub : Hub
             return;
         }
 
-        room.TimeRemaining = 15; // 15 seconds per turn
+        room.TimeRemaining = room.TurnTimerSeconds; // Use custom timer
         await NotifyRoomState(room);
 
         room.TurnTimer?.Dispose();
@@ -208,6 +218,7 @@ public class GameHub : Hub
             room.CurrentLetter,
             room.Language,
             room.MaxPlayers,
+            room.TurnTimerSeconds,
             SelectedCategoriesCount = room.SelectedCategories.Count,
             room.TimeRemaining,
             ActivePlayer = room.GetActivePlayer()?.Name,

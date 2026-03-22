@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
-const VERSION = "v1.2.8-sync"
+const VERSION = "v1.3.0-timer"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5122"
 
 function App() {
@@ -18,6 +18,7 @@ function App() {
   const [lobbyView, setLobbyView] = useState('selection') // 'selection', 'host', 'join'
   const [selectedLang, setSelectedLang] = useState('en')
   const [selectedMaxPlayers, setSelectedMaxPlayers] = useState(2)
+  const [selectedTimer, setSelectedTimer] = useState(15)
   const [allCategories, setAllCategories] = useState([])
   const [selectedCategories, setSelectedCategories] = useState([])
   const [isHost, setIsHost] = useState(false)
@@ -65,6 +66,12 @@ function App() {
       connection.invoke("SetCategories", roomCode, selectedCategories)
     }
   }, [selectedCategories, isHost, roomCode, connection])
+
+  useEffect(() => {
+    if (isHost && roomCode && connection) {
+      connection.invoke("SetTurnTimer", roomCode, selectedTimer)
+    }
+  }, [selectedTimer, isHost, roomCode, connection])
 
   useEffect(() => {
     // Fetch all categories from Supabase
@@ -320,6 +327,21 @@ function App() {
               </div>
 
               <div className="language-selection">
+                <span className="label">Turn Timer (Seconds)</span>
+                <div className="limit-toggle-group">
+                  {[5, 10, 15, 20, 30].map(sec => (
+                    <button 
+                      key={sec}
+                      className={`limit-btn ${selectedTimer === sec ? 'active' : ''}`}
+                      onClick={() => setSelectedTimer(sec)}
+                    >
+                      {sec}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="language-selection">
                 <span className="label">Warrior Categories</span>
                 <div className="category-chips">
                   {allCategories.filter(c => c.language === selectedLang).map(cat => (
@@ -432,7 +454,7 @@ function App() {
                <div className={`timer-modern ${timer < 5 ? 'critical' : ''}`}>
                   <svg className="timer-svg" viewBox="0 0 36 36">
                     <path className="timer-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path className="timer-progress" strokeDasharray={`${(timer / 15) * 100}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="timer-progress" strokeDasharray={`${(timer / (gameState?.turnTimerSeconds || 15)) * 100}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                   </svg>
                   <span className="timer-text">{timer}</span>
                </div>
@@ -450,9 +472,9 @@ function App() {
                     </div>
                   )}
                </div>
-            </div>
           </div>
        </div>
+     </div>
     </div>
   )
 }
