@@ -11,7 +11,8 @@ public class GameRoom
     
     // Custom Mode State
     public string CurrentCategory { get; set; } = string.Empty;
-    public char CurrentLetter { get; set; } = 'A';
+    public string CurrentLetter { get; set; } = "A";
+    public string Language { get; set; } = "en"; // "en" or "ar"
     public int CurrentTurnIndex { get; set; } = 0;
     public int TimeRemaining { get; set; } = 0;
     public Timer? TurnTimer { get; set; }

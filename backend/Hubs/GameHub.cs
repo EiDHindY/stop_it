@@ -37,6 +37,16 @@ public class GameHub : Hub
         }
     }
 
+    public async Task SetLanguage(string roomCode, string language)
+    {
+        var room = _gameManager.GetRoom(roomCode);
+        if (room != null && !room.GameStarted)
+        {
+            room.Language = language;
+            await NotifyRoomState(room);
+        }
+    }
+
     public async Task StartGame(string roomCode)
     {
         var room = _gameManager.GetRoom(roomCode);
@@ -44,8 +54,8 @@ public class GameHub : Hub
         {
             room.GameStarted = true;
             room.CurrentTurnIndex = 0;
-            room.CurrentCategory = "Songs"; // Example default
-            room.CurrentLetter = 'A';
+            room.CurrentCategory = room.Language == "ar" ? "جماد" : "Songs";
+            room.CurrentLetter = GetRandomLetter(room.Language);
             
             await NextTurn(room);
         }
@@ -74,8 +84,7 @@ public class GameHub : Hub
         }
 
         // Change letter/category randomly for the next turn
-        var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        room.CurrentLetter = letters[new Random().Next(letters.Length)];
+        room.CurrentLetter = GetRandomLetter(room.Language);
         
         await NextTurn(room);
     }
@@ -144,6 +153,16 @@ public class GameHub : Hub
         }
     }
 
+    private string GetRandomLetter(string lang)
+    {
+        var english = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var arabic = "أبتثجحخدذرزسشصضطظعغفقكلمنهوي";
+        
+        var picked = lang == "ar" ? arabic : english;
+        var res = picked[new Random().Next(picked.Length)].ToString();
+        return res;
+    }
+
     private async Task NotifyRoomState(GameRoom room)
     {
         await Clients.Group(room.RoomCode).SendAsync("RoomStateUpdated", new
@@ -152,6 +171,7 @@ public class GameHub : Hub
             room.GameStarted,
             room.CurrentCategory,
             room.CurrentLetter,
+            room.Language,
             room.TimeRemaining,
             ActivePlayer = room.GetActivePlayer()?.Name,
             Players = room.Players.Select(p => new { p.Name, p.IsEliminated })

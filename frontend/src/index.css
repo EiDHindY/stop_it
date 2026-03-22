@@ -165,6 +165,47 @@ button {
 .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; margin: 2rem 0; }
 .player-bubble { padding: 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); }
 
+/* --- LANGUAGE SELECTION --- */
+.language-selection {
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.language-selection .label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.toggle-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+}
+
+.toggle-btn {
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+}
+
 /* --- ACTIVE GAME UI --- */
 
 .game-container {
@@ -187,7 +228,13 @@ button {
 .eliminated { opacity: 0.4; filter: grayscale(1); }
 
 .category-banner { padding: 1rem 2rem; text-align: center; font-size: 1.8rem; font-weight: 600; margin-bottom: 2rem; }
-.giant-letter { font-size: 12rem; font-weight: 800; text-align: center; line-height: 1; margin: 2rem 0; background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 20px 40px rgba(56, 189, 248, 0.3); }
+.giant-letter { font-size: 12rem; font-weight: 800; text-align: center; line-height: 1; margin: 2rem 0; background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 20px 40px rgba(56, 189, 248, 0.3); transition: all 0.5s ease; }
+
+.arabic-mode .giant-letter {
+  font-size: 14rem;
+  font-family: 'Outfit', sans-serif; /* We can add a specific Arabic font later if needed */
+  margin: 1rem 0;
+}
 
 .game-footer { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
 

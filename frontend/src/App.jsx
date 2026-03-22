@@ -78,6 +78,12 @@ function App() {
     connection.invoke("StartGame", roomCode)
   }
 
+  const setLanguage = (lang) => {
+    if (connection && roomCode) {
+      connection.invoke("SetLanguage", roomCode, lang)
+    }
+  }
+
   const submitAnswer = () => {
     connection.invoke("SubmitAnswer", roomCode, "") // For this mode, clicking is the answer
   }
@@ -172,14 +178,32 @@ function App() {
             ))}
           </div>
 
+          <div className="language-selection">
+            <span className="label">Linguistic Battleground</span>
+            <div className="toggle-group">
+              <button 
+                className={`toggle-btn ${gameState?.language === 'en' ? 'active' : ''}`}
+                onClick={() => setLanguage('en')}
+              >
+                ENGLISH
+              </button>
+              <button 
+                className={`toggle-btn ${gameState?.language === 'ar' ? 'active' : ''}`}
+                onClick={() => setLanguage('ar')}
+              >
+                ARABIC
+              </button>
+            </div>
+          </div>
+
           <div className="waiting-footer">
-            <p>{gameState?.players.length < 2 ? "Need at least 2 players to start" : "Ready to begin!"}</p>
+            <p>{gameState?.players.length < 2 ? "Need at least 2 warriors for a clash" : "Armies are ready!"}</p>
             <button 
               className="start-btn-premium"
               onClick={startGame} 
               disabled={gameState?.players.length < 2}
             >
-              START GAME
+              IGNITE BATTLE
             </button>
           </div>
         </div>
@@ -211,7 +235,7 @@ function App() {
                {gameState.currentCategory}
             </div>
             
-            <div className="letter-display">
+            <div className={`letter-display ${gameState.language === 'ar' ? 'arabic-mode' : ''}`}>
                <h1 className="giant-letter">{gameState.currentLetter}</h1>
             </div>
 
