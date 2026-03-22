@@ -47,14 +47,44 @@ public class GameHub : Hub
         }
     }
 
+    public async Task SetMaxPlayers(string roomCode, int maxPlayers)
+    {
+        var room = _gameManager.GetRoom(roomCode);
+        if (room != null && !room.GameStarted)
+        {
+            room.MaxPlayers = maxPlayers;
+            await NotifyRoomState(room);
+        }
+    }
+
+    public async Task SetCategories(string roomCode, string[] categories)
+    {
+        var room = _gameManager.GetRoom(roomCode);
+        if (room != null && !room.GameStarted)
+        {
+            room.SelectedCategories = categories.ToList();
+            await NotifyRoomState(room);
+        }
+    }
+
     public async Task StartGame(string roomCode)
     {
         var room = _gameManager.GetRoom(roomCode);
-        if (room != null && !room.GameStarted && room.Players.Count > 1)
+        if (room != null && !room.GameStarted && room.Players.Count >= 1)
         {
             room.GameStarted = true;
             room.CurrentTurnIndex = 0;
-            room.CurrentCategory = room.Language == "ar" ? "جماد" : "Songs";
+            
+            // Pick first category
+            if (room.SelectedCategories.Any())
+            {
+                room.CurrentCategory = room.SelectedCategories[new Random().Next(room.SelectedCategories.Count)];
+            }
+            else
+            {
+                room.CurrentCategory = room.Language == "ar" ? "جماد" : "General";
+            }
+
             room.CurrentLetter = GetRandomLetter(room.Language);
             
             await NextTurn(room);
@@ -85,6 +115,10 @@ public class GameHub : Hub
 
         // Change letter/category randomly for the next turn
         room.CurrentLetter = GetRandomLetter(room.Language);
+        if (room.SelectedCategories.Any())
+        {
+            room.CurrentCategory = room.SelectedCategories[new Random().Next(room.SelectedCategories.Count)];
+        }
         
         await NextTurn(room);
     }
@@ -173,6 +207,8 @@ public class GameHub : Hub
             room.CurrentCategory,
             room.CurrentLetter,
             room.Language,
+            room.MaxPlayers,
+            SelectedCategoriesCount = room.SelectedCategories.Count,
             room.TimeRemaining,
             ActivePlayer = room.GetActivePlayer()?.Name,
             Players = room.Players.Select(p => new { p.Name, p.IsEliminated })

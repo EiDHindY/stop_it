@@ -28,7 +28,7 @@ public class GameManager
     public bool JoinRoom(string roomCode, Player player)
     {
         var room = GetRoom(roomCode);
-        if (room == null || room.GameStarted) return false;
+        if (room == null || room.GameStarted || room.Players.Count >= room.MaxPlayers) return false;
         
         if (!room.Players.Any(p => p.ConnectionId == player.ConnectionId))
         {

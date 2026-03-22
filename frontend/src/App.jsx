@@ -14,14 +14,27 @@ function App() {
   const [user, setUser] = useState(null)
   const [lobbyView, setLobbyView] = useState('selection') // 'selection', 'host', 'join'
   const [selectedLang, setSelectedLang] = useState('en')
+  const [selectedMaxPlayers, setSelectedMaxPlayers] = useState(10)
+  const [allCategories, setAllCategories] = useState([])
+  const [selectedCategories, setSelectedCategories] = useState([])
+  const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
+    // Fetch all categories from Supabase
+    supabase.from('categories').select('*')
+      .then(({ data, error }) => {
+        if (!error) setAllCategories(data)
+        else console.error('Error fetching categories:', error)
+      })
+
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) {
         setPlayerName(session.user.user_metadata.full_name || session.user.email)
       }
+      // First check done
+      setTimeout(() => setIsInitializing(false), 800) // Small delay for smooth transition
     })
 
     // Listen for changes on auth state
@@ -76,8 +89,10 @@ function App() {
       connection.invoke("JoinRoom", newRoomCode, playerName)
         .then(() => {
           setJoined(true)
-          // Set the language immediately after joining as host
+          // Set the language, max players, and categories immediately after joining as host
           connection.invoke("SetLanguage", newRoomCode, selectedLang)
+          connection.invoke("SetMaxPlayers", newRoomCode, selectedMaxPlayers)
+          connection.invoke("SetCategories", newRoomCode, selectedCategories)
         })
     }
   }
@@ -116,6 +131,21 @@ function App() {
   const logout = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) console.error('Error logging out:', error.message)
+  }
+
+  // 0. LOADING / INITIALIZING VIEW
+  if (isInitializing) {
+    return (
+      <div className="loading-page">
+        <div className="loading-content animate-pulse-gentle">
+          <div className="loading-logo">🛑</div>
+          <div className="loading-bar-container">
+            <div className="loading-bar-progress"></div>
+          </div>
+          <p>Synchronizing with Arena...</p>
+        </div>
+      </div>
+    )
   }
 
   // 1. LOGIN VIEW
@@ -217,6 +247,43 @@ function App() {
                 </div>
               </div>
 
+              <div className="language-selection">
+                <span className="label">Warrior Limit</span>
+                <div className="limit-toggle-group">
+                  {[2, 3, 4, 5, 8, 10].map(num => (
+                    <button 
+                      key={num}
+                      className={`limit-btn ${selectedMaxPlayers === num ? 'active' : ''}`}
+                      onClick={() => setSelectedMaxPlayers(num)}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="language-selection">
+                <span className="label">Warrior Categories</span>
+                <div className="category-chips">
+                  {allCategories.filter(c => c.language === selectedLang).map(cat => (
+                    <button 
+                      key={cat.id}
+                      className={`cat-chip ${selectedCategories.includes(cat.name) ? 'active' : ''}`}
+                      onClick={() => {
+                        if (selectedCategories.includes(cat.name)) {
+                          setSelectedCategories(selectedCategories.filter(c => c !== cat.name))
+                        } else {
+                          setSelectedCategories([...selectedCategories, cat.name])
+                        }
+                      }}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+                {selectedCategories.length === 0 && <p className="selection-hint">Pick at least one category</p>}
+              </div>
+
                <button className="join-btn-premium" onClick={hostGame}>
                  GENERATE & START GAME
                </button>
@@ -233,8 +300,14 @@ function App() {
     return (
       <div className="waiting-page">
         <div className="card-glass waiting-card animate-pulse-gentle">
-          <div className="room-info-header">
-            <h2>Room: <span className="highlight">{roomCode}</span></h2>
+           <div className="room-info-header">
+            <div>
+              <h2>Room: <span className="highlight">{roomCode}</span></h2>
+              <p className="room-limit-status">
+                Capacity: {gameState?.players.length} / {gameState?.maxPlayers} 
+                {gameState?.selectedCategoriesCount > 0 && ` • ${gameState.selectedCategoriesCount} Categories`}
+              </p>
+            </div>
             <div className="badge">Waiting for Players</div>
           </div>
           

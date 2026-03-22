@@ -8,6 +8,8 @@ public class GameRoom
     public string RoomCode { get; set; } = string.Empty;
     public List<Player> Players { get; set; } = new();
     public bool GameStarted { get; set; } = false;
+    public int MaxPlayers { get; set; } = 10;
+    public List<string> SelectedCategories { get; set; } = new();
     
     // Custom Mode State
     public string CurrentCategory { get; set; } = string.Empty;

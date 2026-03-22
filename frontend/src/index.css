@@ -159,6 +159,55 @@ button:disabled {
   100% { box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2); }
 }
 
+/* --- LOADING SCREEN --- */
+.loading-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--bg-deep);
+}
+
+.loading-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loading-logo {
+  font-size: 5rem;
+  filter: drop-shadow(0 0 20px var(--primary-glow));
+}
+
+.loading-bar-container {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-bar-progress {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  animation: loading-slide 2s infinite ease-in-out;
+}
+
+@keyframes loading-slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+.loading-content p {
+  color: var(--text-dim);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
 /* --- PAGE VIEWS --- */
 
 .login-card {
@@ -290,7 +339,90 @@ button:disabled {
 .toggle-btn.active {
   background: var(--primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.limit-toggle-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.limit-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-dim);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  min-width: 40px;
+}
+
+.limit-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.limit-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.room-limit-status {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* --- CATEGORY CHIPS --- */
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.cat-chip {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  color: var(--text-dim);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cat-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.cat-chip.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 5px 15px var(--primary-glow);
+}
+
+.selection-hint {
+  font-size: 0.8rem;
+  color: #ff4b2b; /* A soft warning color */
+  margin-top: 8px;
+  font-weight: 500;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 /* --- ACTIVE GAME UI --- */
