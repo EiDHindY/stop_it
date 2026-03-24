@@ -3,8 +3,8 @@ import * as signalR from '@microsoft/signalr'
 import { supabase } from './supabaseClient'
 import './index.css'
 
-const VERSION = "v1.5.1-vanguard-fix"
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5122"
+const VERSION = "v1.5.2-network-fix"
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `${window.location.protocol}//${window.location.hostname}:5122`
 
 function App() {
   const [connection, setConnection] = useState(null)
@@ -44,6 +44,7 @@ function App() {
       // Check if we've already joined (CRITICAL: added safe navigation)
       if (!gameState?.players?.some(p => p.name === playerName)) {
         connection.invoke("JoinRoom", roomCode, playerName)
+          .catch(e => console.error("Host JoinRoom error:", e))
       }
     }
   }, [lobbyView, roomCode, connection, isHost, playerName, gameState])
@@ -173,9 +174,25 @@ function App() {
 
   const joinRoom = (code) => {
     if (connection && playerName && code) {
+      if (connection.state !== 'Connected') {
+        alert("Not connected to the game server. Please wait or refresh.")
+        return
+      }
       setIsHost(false)
       connection.invoke("JoinRoom", code, playerName)
-        .then(() => setJoined(true))
+        .then((success) => {
+          if (success) {
+            setJoined(true)
+          } else {
+            alert("Cannot join room. It might be full or already started.")
+            setRoomCode('')
+          }
+        })
+        .catch(e => {
+          console.error("JoinRoom failed", e)
+          alert("Error communicating with the server.")
+          setRoomCode('')
+        })
     }
   }
 

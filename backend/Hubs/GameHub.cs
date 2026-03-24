@@ -27,7 +27,7 @@ public class GameHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task JoinRoom(string roomCode, string playerName)
+    public async Task<bool> JoinRoom(string roomCode, string playerName)
     {
         var room = _gameManager.GetRoom(roomCode) ?? _gameManager.CreateRoom(roomCode);
         
@@ -36,7 +36,9 @@ public class GameHub : Hub
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, roomCode);
             await NotifyRoomState(room);
+            return true;
         }
+        return false;
     }
 
     public async Task SetLanguage(string roomCode, string language)
